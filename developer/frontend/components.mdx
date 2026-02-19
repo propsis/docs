@@ -1,0 +1,134 @@
+---
+title: "Component Guide"
+description: "Patterns for building React components — shadcn/ui usage, state handling, loading states, and accessibility."
+icon: "component"
+---
+
+## Component philosophy
+
+Every component in Propsis should handle four states:
+
+1. **Loading** — Show skeleton or spinner while data loads
+2. **Error** — Display a clear error message with recovery option
+3. **Empty** — Design the "no data" state intentionally
+4. **Success** — The normal, data-present state
+
+```tsx
+// Pattern for all data-dependent components
+if (isLoading) return <Skeleton className="h-32 w-full" />;
+if (error) return <ErrorState message={error.message} />;
+if (!data) return <EmptyState message="No deals found" />;
+return <DealCard deal={data} />;
+```
+
+## Using shadcn/ui
+
+Always use shadcn components when available. Check `components/ui/` for installed components before building custom ones.
+
+### Import pattern
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+```
+
+### Adding new components
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+## Conditional classes with cn()
+
+Use the `cn()` utility for conditional class composition:
+
+```tsx
+import { cn } from "@/lib/utils";
+
+<div className={cn(
+  "bg-background border-border rounded-lg p-4",
+  isActive && "ring-2 ring-primary",
+  stage === "lead" && "bg-stage-lead/10"
+)} />
+```
+
+## Common patterns
+
+### Metric card
+
+```tsx
+<div className="rounded-lg border border-border/50 bg-card/50 p-4">
+  <p className="text-sm text-muted-foreground">Pipeline Value</p>
+  <p className="text-2xl font-bold">$8,400,000</p>
+  <p className="text-xs text-muted-foreground">+10.1% vs last month</p>
+</div>
+```
+
+### Stage badge
+
+```tsx
+const stageColors: Record<string, string> = {
+  lead: "bg-stage-lead/10 text-stage-lead border-stage-lead/20",
+  research: "bg-stage-research/10 text-stage-research border-stage-research/20",
+  analysis: "bg-stage-analysis/10 text-stage-analysis border-stage-analysis/20",
+};
+
+<Badge className={stageColors[deal.stage]}>
+  {deal.stage}
+</Badge>
+```
+
+### Card (signature look)
+
+```tsx
+<Card className="border-border/50 bg-card/50">
+  <CardContent className="p-4">
+    {/* content */}
+  </CardContent>
+</Card>
+```
+
+## Accessibility requirements
+
+Every component must include:
+
+- **`aria-label`** on interactive elements without visible text
+- **Keyboard navigation** — Tab, Enter, Escape must work
+- **Visible focus states** — Focus rings on all interactive elements
+- **Screen reader compatibility** — Semantic HTML, ARIA roles where needed
+
+## Common mistakes to avoid
+
+### Dynamic Tailwind classes (critical)
+
+```tsx
+// WRONG — Gets purged at build time
+className={`bg-${color}-500`}
+
+// CORRECT — Static mapping
+const colors = { blue: "bg-blue-500", red: "bg-red-500" };
+className={colors[color]}
+```
+
+### Missing null checks
+
+```tsx
+// WRONG — Crashes if property is null
+<p>{deal.property.city}</p>
+
+// CORRECT — Safe optional chaining
+<p>{deal.property?.city ?? "Unknown"}</p>
+```
+
+### Reinventing shadcn components
+
+```tsx
+// WRONG — Custom button
+<button className="px-4 py-2 rounded bg-primary text-primary-foreground">
+
+// CORRECT — Use shadcn
+<Button>Click me</Button>
+```

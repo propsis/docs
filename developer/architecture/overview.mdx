@@ -1,0 +1,64 @@
+---
+title: "Architecture Overview"
+description: "High-level system architecture, team boundaries, and development philosophy for the Propsis platform."
+icon: "blocks"
+---
+
+## System overview
+
+Propsis is a full-stack web application built with Next.js, Supabase, and modern React. The codebase is split between frontend (Este) and backend (Zach) with strict file boundaries to enable parallel development.
+
+## Architecture diagram
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Client (Browser)                  │
+│  Next.js App Router + React + Tailwind + shadcn/ui  │
+└──────────────────────┬──────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│                  Next.js API Routes                  │
+│              /api/deals, /api/dashboard              │
+└──────┬───────────────┬───────────────┬──────────────┘
+       │               │               │
+       ▼               ▼               ▼
+┌────────────┐  ┌────────────┐  ┌────────────────┐
+│  Supabase  │  │   Inngest  │  │  ATTOM Data    │
+│  (DB/Auth  │  │ (Background│  │  (Property     │
+│  /Storage) │  │   Jobs)    │  │   Data API)    │
+└────────────┘  └────────────┘  └────────────────┘
+```
+
+## Team boundaries
+
+The codebase has clear ownership boundaries between frontend and backend:
+
+### Este (Frontend)
+- All React components (`components/*`)
+- Dashboard and auth pages (`app/(dashboard)/*`, `app/(auth)/*`)
+- TypeScript types (`types/*`)
+- Utility functions and pure calculation logic (`lib/utils.ts`, `lib/calculations/*`)
+- Validation schemas (`lib/validations/*`)
+- UI state hooks (`hooks/use-*-ui.ts`)
+- Styles (`app/globals.css`)
+
+### Zach (Backend)
+- API routes (`app/api/*`)
+- Database schema and migrations (`prisma/*`)
+- Supabase clients (`lib/supabase/*`)
+- Data-fetching hooks (`hooks/use-*-data.ts`)
+- Authentication middleware (`middleware.ts`)
+- Background jobs (Inngest)
+
+### Coordination required
+When a frontend feature needs a new API endpoint, database change, or data-fetching hook, the request is documented in `tasks/frontend-backend-requests.md` and coordinated before implementation begins.
+
+## Development philosophy
+
+- **Simplicity above all** — Smallest possible changes, minimal code
+- **Every change should impact as little code as possible** — No massive refactors
+- **Fix root causes, not symptoms** — No temporary patches
+- **Server components by default** — `"use client"` only when needed
+- **Handle errors explicitly** — No silent failures
+- **Beautiful > functional** — We want polished, premium UI

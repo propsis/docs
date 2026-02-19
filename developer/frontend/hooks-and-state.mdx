@@ -1,0 +1,115 @@
+---
+title: "Hooks & State Management"
+description: "Data-fetching hooks (Zach's domain), UI state hooks, and patterns for consuming backend data."
+icon: "plug"
+---
+
+## Hook ownership
+
+Hooks in Propsis follow strict ownership rules:
+
+| Pattern | Owner | Example |
+|---------|-------|---------|
+| `use-*-data.ts` | **Zach (Backend)** | `useDealDetail`, `usePipeline` |
+| `use-*-ui.ts` | **Este (Frontend)** | `useFilterState`, `useSidebarToggle` |
+
+**Frontend developers must never create or modify data-fetching hooks.** If you need a new hook or changes to an existing one, document the requirement in `tasks/frontend-backend-requests.md`.
+
+## Available data hooks
+
+### useDealDetail(dealId)
+
+The primary hook for the deal detail view.
+
+```tsx
+const {
+  deal,        // Full deal object with property, calculators, notes, etc.
+  summary,     // Aggregate counts (totalNotes, overdueDeadlines, etc.)
+  isLoading,   // Boolean — true while fetching
+  error,       // Error object if request failed
+  loadTime,    // Performance metric in ms
+  refetch,     // Function to re-fetch data
+} = useDealDetail(dealId);
+```
+
+### useDealActions(dealId)
+
+Quick actions for a deal.
+
+```tsx
+const {
+  moveStage,     // (stage: PipelineStage) => Promise
+  archiveDeal,   // () => Promise
+  deleteDeal,    // () => Promise
+} = useDealActions(dealId);
+```
+
+### useDealNotes(dealId)
+
+CRUD operations for deal notes.
+
+```tsx
+const {
+  notes,         // Note[]
+  createNote,    // (content: string) => Promise
+  updateNote,    // (noteId: string, content: string) => Promise
+  deleteNote,    // (noteId: string) => Promise
+  addComment,    // (noteId: string, content: string) => Promise
+} = useDealNotes(dealId);
+```
+
+### useDealActivities(dealId)
+
+Paginated activity timeline.
+
+```tsx
+const {
+  activities,    // Activity[]
+  hasMore,       // Boolean — more pages available
+  loadMore,      // () => Promise — load next page
+  isLoading,
+} = useDealActivities(dealId);
+```
+
+### usePipeline()
+
+Pipeline board data.
+
+```tsx
+const {
+  deals,         // Deal[] — all active deals
+  stages,        // Stage[] — stage metadata
+  updateDeal,    // (dealId, updates) => Promise
+} = usePipeline();
+```
+
+## UI state hooks
+
+Frontend developers can create UI state hooks for managing component state that doesn't involve data fetching:
+
+```tsx
+// hooks/use-filter-state-ui.ts
+export function useFilterStateUI() {
+  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const addFilter = useCallback((filter: Filter) => {
+    setFilters(prev => [...prev, filter]);
+  }, []);
+
+  const removeFilter = useCallback((index: number) => {
+    setFilters(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  return { filters, isOpen, setIsOpen, addFilter, removeFilter };
+}
+```
+
+## Requesting new hooks
+
+If you need a data hook that doesn't exist, create a request:
+
+1. Open `tasks/frontend-backend-requests.md`
+2. Document: endpoint name, parameters, expected response shape
+3. Tag Esteban to notify Zach
+4. Wait for implementation before building the UI

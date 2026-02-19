@@ -1,0 +1,158 @@
+---
+title: "Deals API"
+description: "Endpoints for deal CRUD, stage management, notes, activities, and quick actions."
+icon: "handshake"
+---
+
+## Endpoint tree
+
+```
+/api/deals
+├── GET     /                          # List all deals
+├── POST    /                          # Create a deal
+├── GET     /[dealId]                  # Get deal detail
+├── PATCH   /[dealId]                  # Update deal
+├── DELETE  /[dealId]                  # Delete deal
+├── PATCH   /[dealId]/stage            # Move stage
+├── PATCH   /[dealId]/archive          # Archive/unarchive
+├── GET     /[dealId]/activities       # List activities (paginated)
+├── GET     /[dealId]/notes            # List notes
+├── POST    /[dealId]/notes            # Create note
+├── PATCH   /[dealId]/notes/[noteId]   # Update note
+├── DELETE  /[dealId]/notes/[noteId]   # Delete note
+└── POST    /[dealId]/notes/[noteId]/comments  # Add comment
+```
+
+## GET /api/deals/[dealId]
+
+Returns comprehensive deal details including property, photos, documents, calculators, activities, notes, deadlines, and tags.
+
+**Target response time:** < 500ms
+
+### Response structure
+
+```typescript
+{
+  deal: {
+    id: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    listPrice: number;
+    dealType: "flip" | "brrrr" | "rental";
+    stage: PipelineStage;
+    temperature: "hot" | "warm" | "neutral" | "cold";
+    source: string;
+    createdAt: string;
+    updatedAt: string;
+    assignedTo: User | null;
+    property: PropertyDetail | null;
+    calculators: Calculator[];
+    activities: Activity[];       // Most recent 50
+    notes: Note[];                // All, pinned first
+    deadlines: Deadline[];
+    tags: Tag[];
+    documents: Document[];        // Most recent 10
+  };
+  summary: {
+    totalCalculators: number;
+    activeCalculators: number;
+    totalNotes: number;
+    pinnedNotes: number;
+    totalActivities: number;
+    pendingDeadlines: number;
+    overdueDeadlines: number;
+    totalPhotos: number;
+    hasProperty: boolean;
+  };
+}
+```
+
+## PATCH /api/deals/[dealId]
+
+Update deal properties.
+
+### Request body
+
+```typescript
+{
+  temperature?: "hot" | "warm" | "neutral" | "cold";
+  source?: string;
+  assignedToId?: string;
+  listPrice?: number;
+  dealType?: "flip" | "brrrr" | "rental";
+}
+```
+
+## PATCH /api/deals/[dealId]/stage
+
+Move a deal to a different pipeline stage. Automatically logs an activity entry.
+
+### Request body
+
+```typescript
+{
+  stage: "lead" | "research" | "analysis" | "due_diligence" | "offer" | "under_contract" | "closed" | "dead";
+}
+```
+
+## PATCH /api/deals/[dealId]/archive
+
+Toggle archive status on a deal.
+
+### Request body
+
+```typescript
+{
+  archived: boolean;
+}
+```
+
+## DELETE /api/deals/[dealId]
+
+Permanently deletes a deal and all associated data (cascade delete). Requires confirmation from the client.
+
+## GET /api/deals/[dealId]/activities
+
+Paginated activity timeline for a deal.
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `limit` | number | 50 | Items per page |
+
+## Notes CRUD
+
+### POST /api/deals/[dealId]/notes
+
+```typescript
+{
+  content: string;
+  pinned?: boolean;
+}
+```
+
+### POST /api/deals/[dealId]/notes/[noteId]/comments
+
+```typescript
+{
+  content: string;
+}
+```
+
+## Pipeline stage values
+
+```typescript
+type PipelineStage =
+  | "lead"
+  | "research"
+  | "analysis"
+  | "due_diligence"
+  | "offer"
+  | "under_contract"
+  | "closed"
+  | "dead";
+```

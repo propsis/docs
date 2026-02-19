@@ -1,0 +1,118 @@
+---
+title: "Backend Getting Started"
+description: "Setup, environment variables, database connection, and backend development conventions."
+icon: "server"
+---
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Git
+- Supabase project (with connection strings)
+- ATTOM Data API key (for property data)
+
+## Environment setup
+
+Create a `.env` file with the following variables:
+
+```bash
+# Supabase
+DATABASE_URL="postgresql://..."          # Pooling connection (for app)
+DIRECT_URL="postgresql://..."            # Direct connection (for migrations)
+NEXT_PUBLIC_SUPABASE_URL="https://..."
+NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
+SUPABASE_SERVICE_ROLE_KEY="..."
+
+# ATTOM Data
+ATTOM_API_KEY="..."
+
+# Inngest
+INNGEST_EVENT_KEY="..."
+INNGEST_SIGNING_KEY="..."
+```
+
+## Database setup
+
+```bash
+# 1. Generate Prisma client from schema
+npm run db:generate
+
+# 2. Push schema to database (development)
+npm run db:push
+
+# 3. Or create a migration (production)
+npm run db:migrate
+
+# 4. Open Prisma Studio to view data
+npm run db:studio
+```
+
+## Backend file ownership
+
+These files are backend territory:
+
+```
+app/api/*              # API routes
+prisma/schema.prisma   # Database schema
+prisma/migrations/*    # Database migrations
+lib/supabase/*         # Supabase clients
+lib/prisma.ts          # Prisma client
+hooks/use-*-data.ts    # Data fetching hooks
+middleware.ts          # Auth middleware
+```
+
+## API route conventions
+
+All API routes use Next.js App Router conventions:
+
+```typescript
+// app/api/deals/route.ts
+export async function GET(request: Request) {
+  // List deals
+}
+
+export async function POST(request: Request) {
+  // Create deal
+}
+
+// app/api/deals/[dealId]/route.ts
+export async function GET(
+  request: Request,
+  { params }: { params: { dealId: string } }
+) {
+  // Get single deal
+}
+```
+
+## Conventions
+
+- **Zod for all validation** — Validate all request bodies with Zod schemas
+- **Row-level security** — All Supabase tables must have RLS policies
+- **Error handling** — Return consistent error shapes (see API Overview)
+- **No silent failures** — Log errors and return appropriate HTTP status codes
+- **Performance targets** — Single resource < 500ms, lists < 1000ms
+
+## Creating data-fetching hooks
+
+When the frontend needs data, create a hook in `hooks/`:
+
+```typescript
+// hooks/use-deal-detail.ts
+export function useDealDetail(dealId: string) {
+  const { data, error, isLoading, mutate } = useSWR(
+    dealId ? `/api/deals/${dealId}` : null,
+    fetcher
+  );
+
+  return {
+    deal: data?.deal,
+    summary: data?.summary,
+    isLoading,
+    error,
+    refetch: mutate,
+  };
+}
+```
+
+Frontend developers consume these hooks — they never modify them. If a frontend developer needs changes, they'll document the request in `tasks/frontend-backend-requests.md`.

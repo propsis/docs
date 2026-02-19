@@ -1,0 +1,71 @@
+---
+title: "Pipeline Overview"
+description: "Manage your entire deal flow on a visual kanban board with 8 preset stages, drag-and-drop, and real-time activity tracking."
+icon: "kanban"
+---
+
+## The deal pipeline
+
+The deal pipeline is the heart of Propsis. It's a visual kanban board that shows every deal you're working on, organized by stage. At a glance, you can see how many deals are in each stage, what needs attention, and where to focus your time.
+
+## Pipeline layout
+
+The pipeline displays as a horizontal kanban board with one column per stage:
+
+- **8 columns** from left to right: Lead → Research → Analysis → Due Diligence → Offer → Under Contract → Closed → Dead
+- **Column headers** show the stage name and deal count
+- **Deal cards** within each column display key property info
+- **Horizontal scrolling** when all columns don't fit on screen
+
+## Working with deals
+
+### Adding a deal
+
+Click **+ Add Deal** from the pipeline header or dashboard. Enter the property address, list price, and deal type. The deal is created in the **Lead** stage.
+
+### Moving deals between stages
+
+There are two ways to move a deal:
+
+1. **Drag and drop** — Grab a deal card and drop it into a different stage column
+2. **Stage selector** — Open the deal detail and use the stage dropdown
+
+Every stage change is logged in the deal's activity timeline with a timestamp and the user who made the change.
+
+### Deal card information
+
+Each card in the pipeline shows:
+
+- Property address (street, city, state, ZIP)
+- List price (formatted as currency)
+- Deal type badge (Flip, BRRRR, Rental)
+- Temperature indicator (Hot, Warm, Neutral, Cold, Stale)
+- Days in current stage
+- Assignee avatar (if the deal is assigned to a team member)
+
+### Quick actions
+
+Right-click a deal card or use the action menu to:
+
+- Move to a specific stage
+- Change temperature / priority
+- Archive the deal
+- Delete the deal
+
+## Pipeline statistics
+
+The pipeline header displays aggregate metrics:
+
+- **Total active deals** across all stages
+- **Pipeline value** (sum of all deal values)
+- **Stage distribution** — visual bar showing how deals are spread across stages
+- **Average days in pipeline** — how long deals typically take from Lead to Closed
+- **Win rate** — percentage of deals that reach Closed vs Dead
+
+## Performance
+
+The pipeline is designed to handle large deal volumes:
+
+- Loads under 1 second for 100 deals
+- Skeleton loading states while data loads
+- Optimistic updates — moves feel instant, synced in the background

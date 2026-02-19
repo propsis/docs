@@ -1,0 +1,86 @@
+---
+title: "ATTOM Integration"
+description: "External property data API integration for property details, valuations, comps, and market trends."
+icon: "database"
+---
+
+## Overview
+
+Propsis integrates with ATTOM Data Solutions for property data covering 150+ million US properties. ATTOM provides property characteristics, ownership, valuations, transaction history, and market statistics.
+
+## Authentication
+
+ATTOM API uses API key authentication via request header:
+
+```
+APIKey: your-attom-api-key
+```
+
+## Endpoints we use
+
+| Feature | ATTOM Endpoint | Internal Use |
+|---------|----------------|-------------|
+| **Property Details** | `/propertyapi/v1.0.0/property/detail` | Deal property auto-fill |
+| **Property + Owner** | `/propertyapi/v1.0.0/property/detailowner` | Ownership research |
+| **AVM Valuation** | `/propertyapi/v1.0.0/attomavm/detail` | Property valuation estimates |
+| **Sales Comparables** | `/property/v2/salescomparables/...` | CMA tool comp search |
+| **Market Trends** | `/v4/transaction/salestrend` | Dashboard market pulse |
+
+## Dashboard widget mapping
+
+| Dashboard Widget | ATTOM Endpoint | Priority |
+|------------------|----------------|----------|
+| Market Pulse | `/v4/transaction/salestrend` | P0 |
+| Property Auto-fill | `/propertyapi/v1.0.0/property/detailowner` | P1 |
+| Property Valuation | `/propertyapi/v1.0.0/attomavm/detail` | P1 |
+| Sales Comparables | `/property/v2/salescomparables/...` | P2 |
+
+## Market Pulse data transformation
+
+The ATTOM sales trend endpoint returns raw data that must be transformed to our frontend schema:
+
+```typescript
+// ATTOM response → Propsis MarketPulse
+{
+  zipCode: string;
+  medianPrice: attomData.medianamount;
+  priceChangePercent: calculateYoYChange(attomData);
+  daysOnMarket: attomData.avgsaledays;
+  inventoryLevel: calculateInventoryLevel(attomData);
+}
+```
+
+### Inventory level calculation
+
+```typescript
+function calculateInventoryLevel(monthsOfSupply: number) {
+  if (monthsOfSupply < 3) return "low";
+  if (monthsOfSupply <= 6) return "normal";
+  return "high";
+}
+```
+
+## Caching strategy
+
+ATTOM data is cached to minimize API calls and costs:
+
+| Data Type | Cache Duration | Reason |
+|-----------|---------------|--------|
+| Market trends | 1 hour | Changes infrequently |
+| Property details | 24 hours | Stable data |
+| Valuations | 24 hours | Updated periodically by ATTOM |
+| Sales comps | 1 hour | New sales added regularly |
+
+## Error handling
+
+ATTOM API errors are caught and transformed into user-friendly messages:
+
+| ATTOM Error | User-Facing Message |
+|-------------|---------------------|
+| 404 | "Property not found. Please verify the address." |
+| 429 | "Data service is busy. Please try again in a moment." |
+| 500 | "External data service is temporarily unavailable." |
+
+## Rate limits
+
+ATTOM API has rate limits based on our subscription tier. The backend implements request queuing and retry logic to handle rate limit responses gracefully.

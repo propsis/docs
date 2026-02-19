@@ -1,0 +1,108 @@
+---
+title: "Frontend Getting Started"
+description: "Setup, conventions, workflow, and pre-commit checklist for frontend development."
+icon: "play"
+---
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Git
+- Access to the Propsis GitHub repository
+
+## Setup
+
+```bash
+git clone https://github.com/launchtheoryai/propsis.git
+cd propsis
+npm install
+npm run dev
+```
+
+The dev server starts at `http://localhost:3000`.
+
+## Session start checklist
+
+Before writing any code, read these files in order:
+
+1. `CLAUDE.md` — Project rules and development guidelines
+2. `docs/propsis-mvp-prd.md` — Product requirements
+3. `docs/propsis-user-stories.md` — User stories and acceptance criteria
+4. `app/globals.css` — Design system CSS variables
+
+Then check your branch state:
+
+```bash
+git branch          # What branch am I on?
+git status          # Current state?
+git checkout main && git pull origin main   # Sync if needed
+```
+
+## Branch naming
+
+```bash
+# Frontend feature branches
+users/este/feature/ui-[feature-name]
+
+# Examples
+users/este/feature/ui-deal-detail-dialog
+users/este/feature/ui-calculator-inputs
+users/este/feature/ui-pipeline-search
+```
+
+## Development workflow
+
+1. Start from `main` — Always pull latest before branching
+2. Create a feature branch following the naming convention
+3. Read relevant user stories and acceptance criteria
+4. Write a plan to `tasks/todo.md` with checkable items
+5. Wait for approval before starting implementation
+6. Complete tasks one at a time, marking done as you go
+7. Run all checks before committing
+
+## Pre-commit checklist (mandatory)
+
+Run all four checks before every commit — no exceptions:
+
+```bash
+npm run lint          # Must pass — no warnings
+npm run format        # Auto-format code
+npm run type-check    # Must pass — no TypeScript errors
+npm run build         # Must build successfully
+```
+
+If any check fails, fix it before committing.
+
+## Commit messages
+
+Use conventional commits with `(ui)` scope:
+
+```bash
+feat(ui): Add Deal Detail Dialog with property info
+fix(ui): Fix null check in deal header component
+refactor(ui): Extract metric card to reusable component
+style(ui): Update calculator input styling
+chore(ui): Clean up unused imports
+```
+
+## PR creation
+
+**Title format:**
+```
+feat(ui): [Feature Name] (US-XX-XXX)
+```
+
+Include in every PR description: summary, user story reference, components created/modified, testing instructions, screenshots, and the quality checklist.
+
+## Code rules
+
+- **No `any` types** — Use proper TypeScript everywhere
+- **Proper null checks** — Use optional chaining (`?.`) and nullish coalescing (`??`)
+- **`useCallback`** for functions passed to children
+- **`useMemo`** for expensive computations
+- **Proper dependency arrays** in `useEffect`
+- **Keys on list items** — Always provide unique keys
+- **No hardcoded colors** — CSS variables only
+- **No dynamic Tailwind** — Static class mapping only
+- **Server components by default** — `"use client"` only when needed

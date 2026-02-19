@@ -1,0 +1,70 @@
+---
+title: "Tech Stack"
+description: "Complete technology stack powering Propsis — Next.js 16, Supabase, Tailwind, shadcn/ui, and more."
+icon: "layers"
+---
+
+## Core stack
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Next.js** | 16 | Full-stack React framework (App Router) |
+| **React** | 19 | UI library |
+| **TypeScript** | 5 | Type safety |
+| **Tailwind CSS** | 4 | Utility-first styling |
+| **shadcn/ui** | Latest | Component library (New York style, dark theme) |
+
+## Backend & data
+
+| Technology | Purpose |
+|-----------|---------|
+| **Supabase** | Authentication, PostgreSQL database, file storage, RLS policies |
+| **Prisma** | 6.19 — ORM for database access and migrations |
+| **Inngest** | Background job processing |
+
+## External APIs
+
+| Service | Purpose |
+|---------|---------|
+| **ATTOM Data** | Property data, valuations, sales comps, market trends (150M+ US properties) |
+| **Claude API** | AI extraction and analysis (Phase 2) |
+
+## Frontend libraries
+
+| Library | Purpose |
+|---------|---------|
+| **SWR** | Client-side data fetching with caching |
+| **Recharts** | Chart and data visualization |
+| **Mapbox GL** | Map rendering |
+| **Lucide React** | Icon library |
+| **Motion** | Animations (Framer Motion successor) |
+| **Zod** | Schema validation |
+
+## Development tools
+
+| Tool | Purpose |
+|------|---------|
+| **ESLint** | Code linting |
+| **Prettier** | Code formatting |
+| **Prisma Studio** | Database GUI |
+
+## Available commands
+
+```bash
+npm install        # Install dependencies
+npm run dev        # Development server (localhost:3000)
+npm run build      # Production build
+npm run lint       # Lint code
+npm run format     # Format with Prettier
+npm run type-check # TypeScript type checking
+npm test           # Run tests
+```
+
+## Database commands
+
+```bash
+npm run db:generate  # Generate Prisma client types
+npm run db:push      # Push schema changes (dev only)
+npm run db:migrate   # Create migration (production)
+npm run db:studio    # Open Prisma Studio GUI
+```

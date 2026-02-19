@@ -1,0 +1,73 @@
+---
+title: "Key Concepts"
+description: "Understand the core terminology and mental models behind Propsis."
+icon: "lightbulb"
+---
+
+## Deals
+
+A **deal** is the central unit in Propsis. It represents a potential real estate investment — from the moment you identify a property to the moment you close (or kill) the deal. Every deal has:
+
+- A **property** (address, details, photos)
+- A **pipeline stage** (where it stands in your workflow)
+- A **deal type** (Fix & Flip, BRRRR, or Rental)
+- A **temperature** (Hot, Warm, Neutral, Cold) indicating priority
+- **Financial analyses** (one or more calculator results)
+- **Documents** (contracts, inspections, photos)
+- **Notes and activity history**
+
+## Pipeline stages
+
+The pipeline represents the lifecycle of a deal. Propsis uses 8 fixed stages that reflect the natural progression of a real estate investment:
+
+| Stage | What happens here |
+|-------|-------------------|
+| **Lead** | You've identified a property worth looking at |
+| **Research** | You're gathering info — comps, neighborhood data, ownership history |
+| **Analysis** | You're running the numbers with calculators |
+| **Due Diligence** | Inspections, title search, deeper evaluation before committing |
+| **Offer** | Your offer is submitted and pending response |
+| **Under Contract** | Offer accepted — you're working toward closing |
+| **Closed** | Deal complete. Property acquired or sold. |
+| **Dead** | Deal fell through or you walked away |
+
+Stages are preset and cannot be modified. This is intentional — a consistent process prevents costly mistakes from skipping steps.
+
+## Deal types
+
+Propsis supports three primary investment strategies:
+
+- **Fix & Flip** — Buy a distressed property, renovate it, and sell for profit. Key metrics: ARV, rehab cost, MAO, ROI.
+- **BRRRR** — Buy, Rehab, Rent, Refinance, Repeat. Designed for building a rental portfolio through the refinance-and-repeat cycle. Key metrics: all-in cost, rental income, refinance LTV, equity captured.
+- **Rental (Buy & Hold)** — Purchase a property for long-term rental income. Key metrics: cap rate, cash-on-cash return, monthly cash flow, DSCR.
+
+## Temperature & health
+
+Each deal has a temperature indicator that helps you prioritize:
+
+| Temperature | Meaning |
+|-------------|---------|
+| **Hot** | High priority — move fast on this one |
+| **Warm** | Active, moderate priority |
+| **Neutral** | Default state |
+| **Cold** | Low priority — on the back burner |
+| **Stale** | System-detected: no activity for 14+ days |
+
+The **Stale** status is automatically applied when a deal has had no activity for a configurable period (default: 14 days). This prevents deals from silently dying in your pipeline.
+
+## Key financial terms
+
+| Term | Definition |
+|------|-----------|
+| **ARV** | After Repair Value — estimated market value of the property after renovations |
+| **MAO** | Maximum Allowable Offer — the most you should pay based on your profit targets |
+| **Cap Rate** | Capitalization Rate — annual net operating income divided by property value |
+| **Cash-on-Cash Return** | Annual pre-tax cash flow divided by total cash invested |
+| **DSCR** | Debt Service Coverage Ratio — net operating income divided by annual debt payments |
+| **NOI** | Net Operating Income — gross rental income minus operating expenses (before debt service) |
+| **LTV** | Loan-to-Value — loan amount as a percentage of property value |
+| **ROI** | Return on Investment — total profit divided by total investment |
+
+## CMA (Comparative Market Analysis)
+
+A CMA estimates a property's value by comparing it to recently sold properties (comps) with similar characteristics. Propsis uses AI to find comparable sales, apply adjustments for differences (square footage, bedrooms, condition, etc.), and generate an ARV estimate.

@@ -1,0 +1,69 @@
+---
+title: "Background Jobs"
+description: "Inngest-powered background processing for async tasks, scheduled jobs, and event-driven workflows."
+icon: "clock"
+---
+
+## Overview
+
+Propsis uses Inngest for background job processing. Inngest handles asynchronous tasks that shouldn't block API responses, scheduled maintenance jobs, and event-driven workflows.
+
+## Architecture
+
+```
+API Route → Inngest Event → Background Function → Result
+```
+
+When an API route needs to trigger async work, it sends an event to Inngest. Inngest then executes the registered function outside the request/response cycle.
+
+## Use cases
+
+| Job Type | Trigger | Purpose |
+|----------|---------|---------|
+| **Stale deal detection** | Scheduled (daily) | Flag deals with no activity for 14+ days |
+| **Market data refresh** | Scheduled (hourly) | Update ATTOM market pulse data cache |
+| **Activity logging** | Event-driven | Log deal activities asynchronously |
+| **Email notifications** | Event-driven | Send deadline reminders and alerts |
+| **Data enrichment** | Event-driven | Auto-populate property data from ATTOM |
+
+## Scheduled jobs
+
+### Stale deal detection
+- **Schedule:** Daily at 6:00 AM UTC
+- **Logic:** Find all deals with `lastActivityAt` older than 14 days, set temperature to "stale"
+- **Result:** Affected deals appear in the Action Items dashboard widget
+
+### Market data refresh
+- **Schedule:** Hourly
+- **Logic:** Re-fetch ATTOM sales trend data for all active deal ZIP codes
+- **Result:** Updated market pulse data on dashboard
+
+## Event-driven jobs
+
+### Activity logging
+
+When a deal action occurs (stage change, note added, etc.), the API route sends an event:
+
+```typescript
+await inngest.send({
+  name: "deal/activity.created",
+  data: {
+    dealId: deal.id,
+    type: "stage_change",
+    description: "Moved from Research to Analysis",
+    userId: user.id,
+  },
+});
+```
+
+The background function creates the activity record and updates the deal's `lastActivityAt` timestamp.
+
+## Error handling
+
+- Failed jobs are automatically retried (up to 3 attempts with exponential backoff)
+- Persistent failures are logged for monitoring
+- Critical job failures (e.g., market data refresh) trigger alerts
+
+## Configuration
+
+Inngest configuration is in the API routes at `app/api/inngest/route.ts`. Event keys and signing keys are stored in environment variables.

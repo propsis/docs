@@ -1,0 +1,75 @@
+---
+title: "Authentication"
+description: "Supabase Auth setup, session management, middleware, and protected routes."
+icon: "lock"
+---
+
+## Auth provider
+
+Propsis uses Supabase Auth for authentication. Supabase handles:
+
+- User registration and email verification
+- Login with email/password
+- Session management with JWT tokens
+- Password reset flow
+
+## Auth flow
+
+### Sign up
+1. User submits email + password
+2. Supabase creates the user and sends verification email
+3. User clicks verification link
+4. User redirected to dashboard
+
+### Login
+1. User submits email + password
+2. Supabase validates credentials and returns session token
+3. Token stored in cookies for subsequent requests
+
+### Password reset
+1. User requests password reset
+2. Supabase sends reset link (valid for 1 hour, single use)
+3. User clicks link and enters new password
+4. Password updated, user logged in
+
+## Session management
+
+| Setting | Value |
+|---------|-------|
+| Session duration | 7 days (default), 30 days with "Remember me" |
+| Failed login attempts | Lock account for 15 minutes after 5 failures |
+| Error messages | Generic "Invalid email or password" (never reveal which) |
+
+## Middleware
+
+The authentication middleware (`middleware.ts`) runs on every request to protected routes:
+
+1. Extract session token from cookies
+2. Validate token with Supabase
+3. Attach user context to the request
+4. Return `401 Unauthorized` if token is invalid or missing
+
+## Protected routes
+
+All routes under `app/(dashboard)/*` and `app/api/*` require authentication. The only public routes are:
+
+- `/login`
+- `/signup`
+- `/forgot-password`
+- `/reset-password`
+
+## Password requirements
+
+| Requirement | Value |
+|-------------|-------|
+| Minimum length | 8 characters |
+| Numbers | At least 1 |
+| Special characters | At least 1 |
+
+## Rate limiting
+
+| Action | Limit |
+|--------|-------|
+| Sign up | 5 attempts per IP per hour |
+| Login | 5 failed attempts before 15-min lockout |
+| Password reset | 3 requests per email per hour |

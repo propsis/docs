@@ -1,0 +1,69 @@
+---
+title: "API Overview"
+description: "REST API architecture, authentication, error handling, and endpoint conventions."
+icon: "square-terminal"
+---
+
+## API architecture
+
+Propsis uses Next.js API routes (App Router) as the backend. All endpoints live under `app/api/` and follow RESTful conventions.
+
+## Base URL
+
+```
+https://app.propsis.io/api
+```
+
+In development:
+```
+http://localhost:3000/api
+```
+
+## Authentication
+
+All API endpoints require authentication via Supabase session tokens. Requests without a valid session return `401 Unauthorized`.
+
+The authentication middleware (`middleware.ts`) validates the session on every request and attaches the user context.
+
+## Error responses
+
+All endpoints return consistent error shapes:
+
+| Status | Meaning | Example |
+|--------|---------|---------|
+| `400` | Bad Request — Invalid input or parameters | Missing required field, invalid format |
+| `401` | Unauthorized — No valid session | Expired token, not logged in |
+| `404` | Not Found — Resource doesn't exist | Deal ID not found |
+| `500` | Server Error — Something went wrong | Database error, unexpected failure |
+
+Error response format:
+```json
+{
+  "error": "Deal not found",
+  "code": "NOT_FOUND"
+}
+```
+
+## API endpoint groups
+
+| Group | Base Path | Purpose |
+|-------|-----------|---------|
+| **Deals** | `/api/deals` | Deal CRUD, stage management, notes, activities |
+| **Dashboard** | `/api/dashboard` | Aggregated statistics, market data, action items |
+| **Properties** | `/api/properties` | Property search and data lookup |
+| **Calculators** | `/api/calculators` | Financial analysis CRUD |
+| **Documents** | `/api/documents` | File upload, download, management |
+| **Users** | `/api/users` | User profile and team management |
+
+## Performance targets
+
+| Endpoint Type | Target Response Time |
+|---------------|---------------------|
+| Single resource GET | < 500ms |
+| List endpoints | < 1000ms |
+| Write operations | < 200ms |
+| Dashboard aggregations | < 1000ms |
+
+## Row-level security
+
+All database tables use Supabase Row-Level Security (RLS) policies. Users can only access data belonging to their account or team. This is enforced at the database level, not just in application code.

@@ -1,0 +1,149 @@
+---
+title: "Design System"
+description: "CSS variables, Tailwind conventions, typography, spacing, colors, and component patterns."
+icon: "paintbrush"
+---
+
+## Design philosophy
+
+Propsis uses a **refined industrial** aesthetic — clean, data-forward, and dark theme optimized. The UI should feel confident and capable, since investors trust this tool with real money decisions.
+
+- **Dark theme first** — The default experience; light mode is secondary
+- **Data density** — Show key numbers at a glance, details on demand
+- **Purposeful motion** — Subtle animations, nothing flashy
+- **Consistent patterns** — Same card style, spacing, and typography everywhere
+
+## Colors — CSS variables only
+
+All colors must use CSS variables defined in `app/globals.css`. Never hardcode hex values or Tailwind color names.
+
+```tsx
+// CORRECT — Use CSS variables
+className="bg-background text-foreground"
+className="border-border"
+className="text-muted-foreground"
+className="bg-card text-card-foreground"
+
+// WRONG — Never hardcode colors
+className="bg-black text-white"
+className="border-gray-800"
+className="text-zinc-400"
+```
+
+### Available CSS variables
+
+| Variable | Purpose |
+|----------|---------|
+| `--background` | Main page background |
+| `--foreground` | Main text color |
+| `--card` | Card backgrounds |
+| `--card-foreground` | Card text |
+| `--primary` | Primary actions and emphasis |
+| `--secondary` | Secondary surfaces |
+| `--muted` | Muted backgrounds |
+| `--muted-foreground` | De-emphasized text |
+| `--accent` | Accent highlights |
+| `--destructive` | Errors, deletions, warnings |
+| `--border` | Border colors |
+| `--input` | Input backgrounds |
+| `--ring` | Focus ring color |
+| `--success` | Positive indicators (profit, green) |
+| `--warning` | Caution indicators (approaching deadline) |
+| `--info` | Informational indicators |
+
+### Pipeline stage colors
+
+Each pipeline stage has dedicated CSS variables:
+
+```tsx
+className="bg-stage-lead text-stage-lead-fg"
+className="bg-stage-research text-stage-research-fg"
+className="bg-stage-analysis text-stage-analysis-fg"
+// ... etc for all 8 stages
+```
+
+Use static mapping objects — never dynamic Tailwind interpolation:
+
+```tsx
+// CORRECT — Static mapping
+const stageColors: Record<string, string> = {
+  lead: "bg-stage-lead text-stage-lead-fg",
+  research: "bg-stage-research text-stage-research-fg",
+  analysis: "bg-stage-analysis text-stage-analysis-fg",
+};
+className={stageColors[stage]}
+
+// WRONG — Dynamic classes get purged at build time
+className={`bg-${color}-500 text-${color}-500`}
+```
+
+## Typography
+
+Use Tailwind's built-in typography scale consistently:
+
+| Element | Classes | Usage |
+|---------|---------|-------|
+| Page title | `text-2xl font-bold` | Top-level headings |
+| Section header | `text-xl font-semibold` | Section dividers |
+| Subsection | `text-lg font-medium` | Sub-sections |
+| Body text | `text-sm text-muted-foreground` | Standard content |
+| Small labels | `text-xs` | Metadata, timestamps |
+
+## Spacing
+
+Use the consistent spacing scale — avoid arbitrary values:
+
+| Scale | Value | Usage |
+|-------|-------|-------|
+| `gap-2` / `p-2` | 8px | Tight spacing (within components) |
+| `gap-4` / `p-4` | 16px | Standard spacing (most common) |
+| `gap-6` / `p-6` | 24px | Generous spacing (between sections) |
+| `gap-8` / `p-8` | 32px | Large spacing (page-level padding) |
+
+## Common component patterns
+
+### Card pattern (signature look)
+
+```tsx
+<Card className="border-border/50 bg-card/50">
+  <CardContent className="p-4">
+    {/* content */}
+  </CardContent>
+</Card>
+```
+
+### Metric card
+
+```tsx
+<div className="rounded-lg border border-border/50 bg-card/50 p-4">
+  <p className="text-sm text-muted-foreground">Label</p>
+  <p className="text-2xl font-bold">$250,000</p>
+  <p className="text-xs text-muted-foreground">+12% vs last month</p>
+</div>
+```
+
+### Stage badge
+
+```tsx
+<Badge className="bg-stage-lead/10 text-stage-lead border-stage-lead/20">
+  Lead
+</Badge>
+```
+
+### Input field
+
+```tsx
+<Input className="bg-background border-border" />
+```
+
+## Button variants
+
+Use shadcn button variants consistently:
+
+| Variant | Usage |
+|---------|-------|
+| `default` | Primary actions (Add Deal, Save) |
+| `secondary` | Secondary actions |
+| `outline` | Tertiary actions |
+| `ghost` | Minimal actions (sidebar items) |
+| `destructive` | Delete, remove, dangerous actions |

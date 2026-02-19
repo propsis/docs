@@ -1,0 +1,136 @@
+---
+title: "Dashboard API"
+description: "Endpoints for aggregated pipeline statistics, market pulse data, action items, and activity feeds."
+icon: "layout-dashboard"
+---
+
+## Endpoints
+
+```
+/api/dashboard
+├── GET  /stats           # Pipeline statistics
+├── GET  /market-pulse    # Market data by ZIP
+├── GET  /action-items    # Deals needing attention
+└── GET  /recent-activity # Activity feed
+```
+
+## GET /api/dashboard/stats
+
+Aggregated pipeline statistics for the authenticated user.
+
+### Response
+
+```typescript
+{
+  activeDeals: number;
+  activeDealsDelta: number;        // Change this week
+  closedDeals: number;
+  closedDealsDelta: number;        // Change vs last month
+  totalPipelineValue: number;
+  expectedProfit: number;
+  avgDaysInPipeline: number;
+  winRate: number;                 // Closed / (Closed + Dead)
+  stageDistribution: {
+    stage: PipelineStage;
+    count: number;
+    value: number;
+  }[];
+}
+```
+
+## GET /api/dashboard/market-pulse
+
+Market data for ZIP codes where the user has active deals.
+
+### Response
+
+```typescript
+{
+  markets: {
+    zipCode: string;
+    medianPrice: number;
+    priceChangePercent: number;     // YoY
+    daysOnMarket: number;
+    inventoryLevel: "low" | "normal" | "high";
+    dealCount: number;             // User's deals in this ZIP
+  }[];
+}
+```
+
+### Inventory level calculation
+
+| Months of Supply | Level |
+|------------------|-------|
+| < 3 months | `low` (seller's market) |
+| 3–6 months | `normal` (balanced) |
+| > 6 months | `high` (buyer's market) |
+
+## GET /api/dashboard/action-items
+
+Deals that need attention, sorted by priority.
+
+### Response
+
+```typescript
+{
+  items: {
+    dealId: string;
+    address: string;
+    priority: "critical" | "warning" | "hot" | "stale";
+    reason: string;
+    stage: PipelineStage;
+    daysInStage: number;
+    lastActivity: string;
+  }[];
+}
+```
+
+### Priority definitions
+
+| Priority | Trigger |
+|----------|---------|
+| `critical` | Overdue deadlines |
+| `warning` | Deadlines within 3 days |
+| `hot` | User-flagged as hot temperature |
+| `stale` | No activity for 14+ days |
+
+## GET /api/dashboard/recent-activity
+
+Global activity feed across all deals.
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | number | 20 | Number of activities |
+
+### Response
+
+```typescript
+{
+  activities: {
+    id: string;
+    type: ActivityType;
+    description: string;
+    dealId: string;
+    dealAddress: string;
+    userId: string;
+    userName: string;
+    createdAt: string;
+  }[];
+}
+```
+
+### Activity types
+
+```typescript
+type ActivityType =
+  | "stage_change"
+  | "note_added"
+  | "deal_created"
+  | "document_uploaded"
+  | "analysis_saved"
+  | "assignee_changed"
+  | "temperature_changed"
+  | "deadline_changed";
+```

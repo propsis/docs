@@ -1,0 +1,121 @@
+---
+title: "Project Structure"
+description: "Directory layout, file organization conventions, and code ownership boundaries."
+icon: "folder-tree"
+---
+
+## Top-level structure
+
+```
+propsis/
+├── app/                    # Next.js App Router
+│   ├── api/               # Backend API routes (Zach)
+│   ├── (dashboard)/       # Dashboard pages (Este)
+│   └── (auth)/            # Auth UI pages (Este)
+├── components/             # React components (Este)
+│   ├── ui/                # shadcn/ui base components
+│   ├── forms/             # Form components
+│   ├── pipeline/          # Kanban/pipeline components
+│   └── calculators/       # Financial calculator components
+├── lib/                    # Shared utilities
+│   ├── supabase/          # Supabase clients (Zach)
+│   ├── calculations/      # Pure functions (Este)
+│   ├── validations/       # Zod schemas (Este)
+│   └── utils.ts           # Utility functions (Este)
+├── hooks/                  # React hooks
+│   ├── use-*-data.ts      # Data fetching (Zach)
+│   └── use-*-ui.ts        # UI state only (Este)
+├── types/                  # TypeScript types (Este)
+├── prisma/                 # Database schema (Zach)
+├── docs/                   # Internal project documentation
+├── tasks/                  # Task tracking and coordination
+└── public/                 # Static assets
+```
+
+## Component organization
+
+Components are organized by feature with barrel exports:
+
+```
+components/
+├── deal-detail/
+│   ├── deal-detail-dialog.tsx
+│   ├── deal-header.tsx
+│   ├── deal-property-info.tsx
+│   └── index.ts              # Barrel export
+├── pipeline/
+│   ├── pipeline-board.tsx
+│   ├── pipeline-column.tsx
+│   ├── deal-card.tsx
+│   └── index.ts
+└── ui/                       # shadcn components (auto-generated)
+    ├── button.tsx
+    ├── card.tsx
+    ├── dialog.tsx
+    └── ...
+```
+
+### Barrel export pattern
+
+Every feature directory must include an `index.ts` that re-exports its components:
+
+```typescript
+// components/deal-detail/index.ts
+export { DealDetailDialog } from "./deal-detail-dialog";
+export { DealHeader } from "./deal-header";
+export { DealPropertyInfo } from "./deal-property-info";
+```
+
+## Import conventions
+
+```typescript
+// Component imports
+import { Button } from "@/components/ui/button";
+import { DealDetailDialog } from "@/components/deal-detail";
+
+// Hook imports
+import { useDealDetail } from "@/hooks/use-deal-detail";
+
+// Type imports
+import type { Deal, PipelineStage } from "@/types/deal";
+
+// Utility imports
+import { cn } from "@/lib/utils";
+import { calculateROI } from "@/lib/calculations/roi";
+```
+
+## Adding shadcn components
+
+When you need a new UI component, install it from shadcn:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+Available components are in `components/ui/`. Always use shadcn components when available rather than building custom ones.
+
+## File boundaries (strict)
+
+### Frontend (Este) — CAN modify
+```
+components/*
+app/(dashboard)/*
+app/(auth)/*
+types/*.ts
+lib/utils.ts
+lib/calculations/*.ts
+lib/validations/*.ts
+hooks/use-*-ui.ts
+app/globals.css
+```
+
+### Backend (Zach) — MUST NOT touch
+```
+app/api/*
+prisma/schema.prisma
+prisma/migrations/*
+lib/supabase/*
+lib/prisma.ts
+hooks/use-*-data.ts
+middleware.ts
+```

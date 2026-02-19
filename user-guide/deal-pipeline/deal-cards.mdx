@@ -1,0 +1,60 @@
+---
+title: "Deal Cards"
+description: "Everything displayed on a deal card in the pipeline view and how to interpret deal health indicators."
+icon: "square"
+---
+
+## Anatomy of a deal card
+
+Each deal in the pipeline is represented by a card showing the most important information at a glance:
+
+- **Property address** — Street address as the primary label (bold)
+- **City, State ZIP** — Location below the address
+- **List price** — Formatted as currency (e.g., $275,000)
+- **Deal type badge** — Flip, BRRRR, or Rental
+- **Temperature indicator** — Visual priority badge (Hot, Warm, Neutral, Cold)
+- **Days in stage** — How long the deal has been in its current stage
+- **Assignee avatar** — Team member assigned to this deal (if applicable)
+
+## Temperature indicators
+
+Temperature badges help you quickly identify deal priority:
+
+| Badge | Color | Meaning |
+|-------|-------|---------|
+| Hot | Red | High priority — act fast |
+| Warm | Orange | Active, moderate priority |
+| Neutral | Gray | Default state, no urgency flag |
+| Cold | Blue | Low priority, back burner |
+| Stale | Gray with warning icon | No activity for 14+ days (auto-detected) |
+
+You can set the temperature manually from the deal card action menu or from the deal detail view.
+
+The **Stale** badge is automatically applied by the system when no activity has been recorded for a configurable period (default: 14 days). This helps surface deals that might be slipping through the cracks.
+
+## Deadline warnings
+
+If a deal has upcoming or overdue deadlines, the card displays:
+
+- **Red badge** — Overdue items that need immediate attention
+- **Yellow badge** — Items due within the next 3 days
+
+## Card interactions
+
+- **Click** a card to open the full deal detail view
+- **Drag** a card to move it between pipeline stages
+- **Right-click** (or use the `...` menu) for quick actions: move stage, change temperature, archive, or delete
+
+## Sorting deals within a column
+
+Within each pipeline column, deals can be sorted by:
+
+| Sort option | Direction |
+|-------------|-----------|
+| Date Added | Ascending / Descending |
+| Last Updated | Ascending / Descending |
+| ARV | Ascending / Descending |
+| Potential Profit | Ascending / Descending |
+| Days in Stage | Ascending / Descending |
+
+Sort preferences persist per column. You can also manually drag-sort cards for custom ordering.

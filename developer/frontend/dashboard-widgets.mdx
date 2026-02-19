@@ -1,0 +1,103 @@
+---
+title: "Dashboard Widgets"
+description: "The 8 dashboard widgets — specifications, data sources, and implementation patterns."
+icon: "layout-dashboard"
+---
+
+## Dashboard layout
+
+The dashboard consists of 8 widgets organized in a responsive grid:
+
+1. **Pipeline with Active Deals** — KPIs + stage distribution bar
+2. **Real Estate News** — Headlines feed (NewsAPI)
+3. **Interest Rates** — Current rate + 12-month chart
+4. **Action Required** — Prioritized attention list
+5. **Pipeline Overview** — Visual stage breakdown
+6. **Market Pulse** — Market data by ZIP (ATTOM)
+7. **Recent Activity** — Global activity feed
+8. **Quick Actions** — Add deal, search, profile
+
+## Widget 1: Pipeline with Active Deals
+
+Combines hero metrics with pipeline stage distribution.
+
+**Data source:** `GET /api/dashboard/stats`
+
+**Components:**
+- 4 KPI cards: Active deals, Closed this month, Avg days in pipeline, Win rate
+- Horizontal pipeline bar showing deal counts per stage (clickable)
+
+**Design:** Fey-inspired hero numbers — large, bold, monochromatic with green/red for change indicators.
+
+## Widget 2: Real Estate News
+
+External news feed showing 5 recent real estate headlines.
+
+**Data source:** NewsAPI (server-side cached, 1-hour TTL)
+
+**Components:**
+- Scrollable list of 5 headlines with thumbnails
+- Source attribution and timestamp
+- Click to open full article in new tab
+
+**States:** Skeleton loading, empty (no articles), error (service unavailable)
+
+## Widget 3: Interest Rates
+
+Current mortgage rates with historical context.
+
+**Components:**
+- Current rate displayed prominently
+- 12-month line chart (Recharts)
+- Week-over-week and year-over-year context
+
+## Widget 4: Action Required
+
+Deals needing immediate attention, sorted by priority.
+
+**Data source:** `GET /api/dashboard/action-items`
+
+**Priority color coding:**
+- Red — Overdue deadlines (critical)
+- Yellow — Approaching deadlines (warning)
+- Orange — Hot temperature deals
+- Gray — Stale deals (no activity 14+ days)
+
+## Widget 5: Pipeline Overview
+
+Visual representation of stage distribution.
+
+**Data source:** `GET /api/dashboard/stats` (stageDistribution)
+
+**Components:**
+- Segmented bar showing proportional deal counts per stage
+- Stage colors from design system
+- Click a segment to filter pipeline to that stage
+
+## Widget 6: Market Pulse
+
+Market conditions for active deal areas.
+
+**Data source:** `GET /api/dashboard/market-pulse` (ATTOM data)
+
+**Per ZIP:** Median price, price change %, days on market, inventory level, deal count.
+
+## Widget 7: Recent Activity
+
+Global activity feed across all deals.
+
+**Data source:** `GET /api/dashboard/recent-activity`
+
+**Components:**
+- Chronological list with icons per activity type
+- Deal link, user, and relative timestamp
+- "View all" link to full activity log
+
+## Widget 8: Quick Actions
+
+Top bar with primary actions.
+
+**Components:**
+- **+ Add Deal** button
+- Search input (real-time, debounced 300ms)
+- User profile / settings

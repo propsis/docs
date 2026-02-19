@@ -1,0 +1,105 @@
+---
+title: "Database Schema"
+description: "Core entities, relationships, pipeline stages, and Prisma schema conventions."
+icon: "database"
+---
+
+## Database overview
+
+Propsis uses PostgreSQL via Supabase with Prisma as the ORM. The schema is defined in `prisma/schema.prisma`.
+
+## Core entities
+
+| Entity | Purpose |
+|--------|---------|
+| **User** | Authenticated user account |
+| **Team** | Group of users with shared access |
+| **Deal** | Central entity — a potential real estate investment |
+| **Property** | Physical property details attached to a deal |
+| **Calculator** | Financial analysis results (Flip, BRRRR, Rental) |
+| **CMAReport** | Comparative market analysis data |
+| **Document** | Uploaded files attached to deals |
+| **Contact** | People associated with deals (agents, sellers, etc.) |
+| **Note** | Text notes on deals with comments |
+| **Activity** | Timeline entries tracking all deal actions |
+| **Deadline** | Due dates and milestones on deals |
+| **Tag** | Custom labels for deal categorization |
+
+## Deal pipeline stages
+
+```typescript
+enum PipelineStage {
+  LEAD
+  RESEARCH
+  ANALYSIS
+  DUE_DILIGENCE
+  OFFER
+  UNDER_CONTRACT
+  CLOSED
+  DEAD
+}
+```
+
+Stages are fixed in code — they cannot be modified by users.
+
+## Key relationships
+
+```
+User ─────────── Team (many-to-many)
+  │
+  └── Deal ──────── Property (one-to-one)
+       │
+       ├── Calculator[] (one-to-many)
+       ├── CMAReport[] (one-to-many)
+       ├── Document[] (one-to-many)
+       ├── Contact[] (many-to-many)
+       ├── Note[] (one-to-many)
+       │    └── Comment[] (one-to-many)
+       ├── Activity[] (one-to-many)
+       ├── Deadline[] (one-to-many)
+       └── Tag[] (many-to-many)
+```
+
+## Database commands
+
+```bash
+npm run db:generate  # Generate Prisma client types
+npm run db:push      # Push schema to database (dev only)
+npm run db:migrate   # Create migration file (production)
+npm run db:studio    # Open Prisma Studio GUI browser
+```
+
+## Migration workflow
+
+**Development (local/staging):**
+```bash
+# Make changes to prisma/schema.prisma
+npm run db:push    # Applies changes directly (no migration file)
+```
+
+**Production:**
+```bash
+# Make changes to prisma/schema.prisma
+npm run db:migrate # Creates a migration file in prisma/migrations/
+# Review the migration file
+# Deploy to production
+```
+
+## Row-level security
+
+All tables must have Supabase RLS policies. Users can only access:
+
+- Their own data (personal deals, notes, etc.)
+- Data belonging to their team (shared deals)
+- Public reference data (pipeline stage definitions, etc.)
+
+RLS policies are defined in Supabase dashboard and enforced at the database level, independent of application code.
+
+## Performance indexes
+
+Strategic indexes are created for common query patterns:
+
+- Deal queries by user ID and stage
+- Activity queries by deal ID and timestamp
+- Note queries by deal ID (pinned first, then by date)
+- Document queries by deal ID and category
